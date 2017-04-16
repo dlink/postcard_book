@@ -19,7 +19,7 @@ class Book(object):
 
     def __init__(self):
         self.pdf = FPDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
-        self.pdf.set_font(FONT, '', 16)
+        self.pdf.set_font(FONT, '', 12)
 
     def build(self):
         '''Build Book
@@ -33,12 +33,21 @@ class Book(object):
         self.pdf.output(BOOK_FILENAME, 'F')
 
     def addPage(self, artist):
+        if artist.startswith('joan'):
+            return self.addPage2(artist)
+
         self.pdf.add_page()
         images = self.artists[artist]['images']
         if images.front:
             self.pdf.image(IMAGE_DIR + '/' + images.front, 1, 1, 3.5)
-            self.pdf.set_xy(2, 3.75)
+            self.pdf.set_xy(2, 3.5)
             self.pdf.cell(0, 0, artist)
+
+            self.pdf.set_xy(2, 3.75)
+            self.pdf.cell(0, 0, 'New York, NY, USA')
+
+            self.pdf.set_xy(2, 4.0 )
+            self.pdf.cell(0, 0, 'http://somecoolartpics.com')
 
         if images.back:
             self.pdf.image(IMAGE_DIR + '/' + images.back, 5, 1, 3.5)
@@ -49,6 +58,19 @@ class Book(object):
             self.pdf.cell(0, 0, artist)
         if images.back:
             self.pdf.image(IMAGE_DIR + '/' + images.back, 5, 4.5, 3.5)
+
+    def addPage2(self, artist):
+        '''Landscape photo'''
+        self.pdf.add_page()
+        images = self.artists[artist]['images']
+        if images.front:
+            self.pdf.image(IMAGE_DIR + '/' + images.front, 1.75, 1, 2.5)
+            self.pdf.set_xy(2, 5)
+            self.pdf.cell(0, 0, artist)
+
+        if images.back:
+            self.pdf.image(IMAGE_DIR + '/' + images.back, 5.25, 1, 2.5)
+
 
     def getArtists(self):
         '''Return dictionary of artists data from
