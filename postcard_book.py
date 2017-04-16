@@ -6,11 +6,12 @@ from fpdf import FPDF
 
 from odict import odict
 
-BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625]
+BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625] # height, width
 FONT = 'Arial'
+BOOK_FILENAME = 'book.pdf'
+
 IMAGE_DIR = '/data/afa_images'
 SUPPORTED_EXTENSIONS = ['jpg', 'png']
-
 
 class FilenameError(Exception): pass
 
@@ -21,20 +22,33 @@ class Book(object):
         self.pdf.set_font(FONT, '', 16)
 
     def build(self):
+        '''Build Book
+           Creates PDF file, BOOK_FILENAME
+        '''
         self.artists = self.getArtists()
         artist_keys = sorted(self.artists.keys())
         for i in range(0, 5):
             for artist in artist_keys:
                 self.addPage(artist)
-        self.pdf.output('book.pdf', 'F')
+        self.pdf.output(BOOK_FILENAME, 'F')
 
     def addPage(self, artist):
         self.pdf.add_page()
         images = self.artists[artist]['images']
         if images.front:
-            self.pdf.image(IMAGE_DIR + '/' + images.front, 0, 0, 3)
+            self.pdf.image(IMAGE_DIR + '/' + images.front, 1, 1, 3.5)
+            self.pdf.set_xy(2, 3.75)
+            self.pdf.cell(0, 0, artist)
+
         if images.back:
-            self.pdf.image(IMAGE_DIR + '/' + images.back, 4, 0, 3)
+            self.pdf.image(IMAGE_DIR + '/' + images.back, 5, 1, 3.5)
+
+        if images.front:
+            self.pdf.image(IMAGE_DIR + '/' + images.front, 1, 4.5, 3.5)
+            self.pdf.set_xy(2, 7.25)
+            self.pdf.cell(0, 0, artist)
+        if images.back:
+            self.pdf.image(IMAGE_DIR + '/' + images.back, 5, 4.5, 3.5)
 
     def getArtists(self):
         '''Return dictionary of artists data from
