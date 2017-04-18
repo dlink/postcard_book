@@ -20,7 +20,7 @@ class Book(object):
 
     def __init__(self):
         self.pdf = FPDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
-        self.pdf.set_font(FONT, '', 12)
+        self.pdf.set_font(FONT, '', 14)
 
     def build(self):
         '''Build Book
@@ -42,34 +42,34 @@ class Book(object):
 
     def addPage_landscape(self, postcard):
         self.pdf.add_page()
-        #files = self.postcards[postcard]['files']
         if postcard.files.front:
             self.pdf.image(IMAGE_DIR + '/' + postcard.files.front, 1, .75, 4.5)
 
         if postcard.files.back:
             self.pdf.image(IMAGE_DIR + '/' + postcard.files.back, 1, 4.50, 4.5)
 
-        self.pdf.set_xy(6, 3.75)
-        self.pdf.cell(0, 0, postcard.name)
-
-        self.pdf.set_xy(6, 4.0)
-        self.pdf.cell(0, 0, 'New York, NY, USA')
-
-        self.pdf.set_xy(6, 4.25 )
-        self.pdf.cell(0, 0, 'http://somecoolartpics.com')
+        text = [postcard.name, 'New York, NY, USA', 
+                'http://somecoolartpics.com']
+        self.place_text(6, 3.75, text)
 
 
     def addPage_portrait(self, postcard):
         self.pdf.add_page()
-        #files = self.postcards[postcard]['files']
         if postcard.files.front:
-            self.pdf.image(IMAGE_DIR + '/' + postcard.files.front, 1.75, 1,2.5)
-            #self.pdf.set_xy(2, 5)
-            #self.pdf.cell(0, 0, postcard)
+            self.pdf.image(IMAGE_DIR + '/' + postcard.files.front, 1.5, 1, 3)
 
         if postcard.files.back:
-            self.pdf.image(IMAGE_DIR + '/' + postcard.files.back, 5.25, 1, 2.5)
+            self.pdf.image(IMAGE_DIR + '/' + postcard.files.back, 5.25, 1, 3)
 
+        text = [postcard.name, 'New York, NY, USA', 
+                'http://somecoolartpics.com']
+        self.place_text(4, 6, text)
+
+    def place_text(self, x, y, text):
+        for t in text:
+            self.pdf.set_xy(x, y)
+            self.pdf.cell(0, 0, t)
+            y += 0.25
 
     def getPostcards(self):
         '''Return dictionary of postcard data from
