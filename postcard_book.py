@@ -5,6 +5,7 @@ import os
 from fpdf import FPDF
 
 from odict import odict
+from images import Image
 
 BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625] # height, width
 FONT = 'Arial'
@@ -25,67 +26,65 @@ class Book(object):
         '''Build Book
            Creates PDF file, BOOK_FILENAME
         '''
-        self.artists = self.getArtists()
-        artist_keys = sorted(self.artists.keys())
-        for i in range(0, 5):
-            for artist in artist_keys:
-                self.addPage(artist)
+        self.postcards = self.getPostcards()
+        postcard_keys = sorted(self.postcards.keys())
+        #for i in range(0, 5):
+        for postcard_key in postcard_keys:
+            self.addPage(self.postcards[postcard_key])
         self.pdf.output(BOOK_FILENAME, 'F')
 
-    def addPage(self, artist):
-        if artist.startswith('joan'):
-            return self.addPage2(artist)
+    def addPage(self, postcard):
+        if Image(IMAGE_DIR + '/' + postcard.files.front).orientation \
+                == 'landscape':
+            return self.addPage_landscape(postcard)
+        else:
+            return self.addPage_portrait(postcard)
 
+    def addPage_landscape(self, postcard):
         self.pdf.add_page()
-        images = self.artists[artist]['images']
-        if images.front:
-            self.pdf.image(IMAGE_DIR + '/' + images.front, 1, 1, 3.5)
-            self.pdf.set_xy(2, 3.5)
-            self.pdf.cell(0, 0, artist)
+        #files = self.postcards[postcard]['files']
+        if postcard.files.front:
+            self.pdf.image(IMAGE_DIR + '/' + postcard.files.front, 1, .75, 4.5)
 
-            self.pdf.set_xy(2, 3.75)
-            self.pdf.cell(0, 0, 'New York, NY, USA')
+        if postcard.files.back:
+            self.pdf.image(IMAGE_DIR + '/' + postcard.files.back, 1, 4.50, 4.5)
 
-            self.pdf.set_xy(2, 4.0 )
-            self.pdf.cell(0, 0, 'http://somecoolartpics.com')
+        self.pdf.set_xy(6, 3.75)
+        self.pdf.cell(0, 0, postcard.name)
 
-        if images.back:
-            self.pdf.image(IMAGE_DIR + '/' + images.back, 5, 1, 3.5)
+        self.pdf.set_xy(6, 4.0)
+        self.pdf.cell(0, 0, 'New York, NY, USA')
 
-        if images.front:
-            self.pdf.image(IMAGE_DIR + '/' + images.front, 1, 4.5, 3.5)
-            self.pdf.set_xy(2, 7.25)
-            self.pdf.cell(0, 0, artist)
-        if images.back:
-            self.pdf.image(IMAGE_DIR + '/' + images.back, 5, 4.5, 3.5)
+        self.pdf.set_xy(6, 4.25 )
+        self.pdf.cell(0, 0, 'http://somecoolartpics.com')
 
-    def addPage2(self, artist):
-        '''Landscape photo'''
+
+    def addPage_portrait(self, postcard):
         self.pdf.add_page()
-        images = self.artists[artist]['images']
-        if images.front:
-            self.pdf.image(IMAGE_DIR + '/' + images.front, 1.75, 1, 2.5)
-            self.pdf.set_xy(2, 5)
-            self.pdf.cell(0, 0, artist)
+        #files = self.postcards[postcard]['files']
+        if postcard.files.front:
+            self.pdf.image(IMAGE_DIR + '/' + postcard.files.front, 1.75, 1,2.5)
+            #self.pdf.set_xy(2, 5)
+            #self.pdf.cell(0, 0, postcard)
 
-        if images.back:
-            self.pdf.image(IMAGE_DIR + '/' + images.back, 5.25, 1, 2.5)
+        if postcard.files.back:
+            self.pdf.image(IMAGE_DIR + '/' + postcard.files.back, 5.25, 1, 2.5)
 
 
-    def getArtists(self):
-        '''Return dictionary of artists data from
+    def getPostcards(self):
+        '''Return dictionary of postcard data from
            - image files in IMAGE_DIR, and
            - artists.csv
 
         Data Structure:
 
-        artists = {'amy_hughes': {'images': {'front': 'amy_hughes.jpg',
+        postcard = {'amy_hughes': {'files': {'front': 'amy_hughes.jpg',
                                              'back': 'amy_hughes-b.jpg'},
                                   'name': 'Amy Hughes',
                                   'residence': 'White Plains, NY, USA'
                                   'website': 'blabla.com',
                                   }
-                   'amy_hughes-2': {'images': {'front': 'amy_hughes-2.jpg',
+                   'amy_hughes-2': {'files': {'front': 'amy_hughes-2.jpg',
                                                'back': 'amy_hughes-2b.jpg'},
                                     'name': 'Amy Hughes',
                                     'residence': 'White Plains, NY, USA'
@@ -94,7 +93,7 @@ class Book(object):
                    }
         '''
 
-        artists = odict()
+        postcards = odict()
         for n, filename in enumerate(os.listdir(IMAGE_DIR)):
 
             # separtate filename and extention:
@@ -117,24 +116,25 @@ class Book(object):
                 name = name[0:-2]
                 parity = 'back'
 
-            # init artist record if nec:
-            if name not in artists:
-                artists[name] = odict({'images': odict({'front': None,
-                                                        'back': None})})
+            # init postcard record if nec:
+            if name not in postcards:
+                postcards[name] = odict({'name': name,
+                                         'files': odict({'front': None,
+                                                         'back': None})})
 
             # add filename
-            artists[name]['images'][parity] = filename
+            postcards[name]['files'][parity] = filename
     
-        # check artists data and print warnings
-        for artist, data in artists.items():
-            if not data.images.front:
-                print 'Warn: %s: No front image' % artist
-            elif not data.images.back:
-                print 'Warn: %s: No back image' % artist
+        # check postcards data and print warnings
+        for postcard, data in postcards.items():
+            if not data.files.front:
+                print 'Warn: %s: No front image' % postcard
+            elif not data.files.back:
+                print 'Warn: %s: No back image' % postcard
 
-        return artists
+        return postcards
 
 if __name__ == '__main__':
     Book().build()
-    #for k, v in Book().getArtists().items():
+    #for k, v in Book().getPostcards().items():
     #    print k, v
