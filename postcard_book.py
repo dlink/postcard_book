@@ -5,6 +5,7 @@ import os
 from fpdf import FPDF
 
 from odict import odict
+from artists import Artists, ArtistNotFound
 from images import Image
 
 BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625] # height, width
@@ -21,6 +22,7 @@ class Book(object):
     def __init__(self):
         self.pdf = FPDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
         self.pdf.set_font(FONT, '', 14)
+        self.artists = Artists()
 
     def build(self):
         '''Build Book
@@ -54,9 +56,7 @@ class Book(object):
         if postcard.files.back:
             self.pdf.image(IMAGE_DIR + '/' + postcard.files.back, 1, 4.50, 4.5)
 
-        text = [postcard.name, 'New York, NY, USA', 
-                'http://somecoolartpics.com']
-        self.place_text(6, 3.75, text)
+        self.place_text(6, 3.75, postcard)
 
 
     def addPage_portrait(self, postcard):
@@ -67,11 +67,18 @@ class Book(object):
         if postcard.files.back:
             self.pdf.image(IMAGE_DIR + '/' + postcard.files.back, 5.25, 1, 3)
 
-        text = [postcard.name, 'New York, NY, USA', 
-                'http://somecoolartpics.com']
-        self.place_text(4, 6, text)
+        self.place_text(4, 6, postcard)
 
-    def place_text(self, x, y, text):
+    def place_text(self, x, y, postcard):
+        try:
+            artist = self.artists.getArtist(postcard['name'])
+        except ArtistNotFound, e:
+            print 'Failed to lookup artist: %s' % postcard['name']
+            artist = Artists.UNKNOWN_ARTIST
+
+        text = [artist['name'],
+                artist['location'],
+                artist['website']]
         for t in text:
             self.pdf.set_xy(x, y)
             self.pdf.cell(0, 0, t)
@@ -121,6 +128,7 @@ class Book(object):
             if name.endswith('-b'):
                 name = name[0:-2]
                 parity = 'back'
+            name = name.replace('_', ' ')
 
             # init postcard record if nec:
             if name not in postcards:

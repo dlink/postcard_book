@@ -2,6 +2,8 @@ import csv
 
 DATAFILE = 'art_for_aleppo_artists.csv'
 
+class ArtistNotFound(Exception): pass
+
 class Artists(object):
 
     def __init__(self):
@@ -27,8 +29,14 @@ class Artists(object):
         return location.replace(', ,', ',')
 
     def getArtist(self, key):
+        if key not in self.data:
+            raise ArtistNotFound('Artist %s not found' % key)
         return self.data[key]
         
+    UNKNOWN_ARTIST = {'name': 'Unknown Artist',
+                      'location': '',
+                      'website': ''}
+
 if __name__ == '__main__':
     artists = Artists()
     
