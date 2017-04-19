@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import PIL.Image, PIL.ExifTags
 
 class Image(object):
