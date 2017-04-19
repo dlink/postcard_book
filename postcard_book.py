@@ -21,7 +21,8 @@ class Book(object):
 
     def __init__(self):
         self.pdf = FPDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
-        self.pdf.set_font(FONT, '', 14)
+        self.pdf.set_font(FONT, '', 12)
+        self.pdf.set_text_color(169,169,169) # DarkGrey
         self.artists = Artists()
 
     def build(self):
@@ -33,7 +34,8 @@ class Book(object):
         for i, postcard_key in enumerate(postcard_keys):
             print i, postcard_key
             self.addPage(self.postcards[postcard_key])
-
+            #if i > 5:
+            #    break
         self.pdf.output(BOOK_FILENAME, 'F')
 
     def addPage(self, postcard):
@@ -75,6 +77,7 @@ class Book(object):
         except ArtistNotFound, e:
             print 'Failed to lookup artist: %s' % postcard['name']
             artist = Artists.UNKNOWN_ARTIST
+            artist['name'] = postcard['name']
 
         text = [artist['name'],
                 artist['location'],
@@ -122,22 +125,23 @@ class Book(object):
             if ext not in SUPPORTED_EXTENSIONS:
                 raise FilenameError('unrecognized extension: %s' % ext)
 
-            # get name, and front or back
+            # get key, `name, and front or back
             parity = 'front'
-            name = parts[0]
-            if name.endswith('-b'):
-                name = name[0:-2]
+            key = parts[0]
+            if key.endswith('-b'):
+                key = key[0:-2]
                 parity = 'back'
-            name = name.replace('_', ' ')
-
+            name = key.replace('_', ' ')
+            if name[-1] in map(str, range(1,10)):
+                name = name[0:-1]
             # init postcard record if nec:
-            if name not in postcards:
-                postcards[name] = odict({'name': name,
-                                         'files': odict({'front': None,
-                                                         'back': None})})
+            if key not in postcards:
+                postcards[key] = odict({'name': name,
+                                        'files': odict({'front': None,
+                                                        'back': None})})
 
             # add filename
-            postcards[name]['files'][parity] = filename
+            postcards[key]['files'][parity] = filename
     
         # check postcards data and print warnings
         for postcard, data in postcards.items():

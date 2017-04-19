@@ -23,17 +23,18 @@ class Artists(object):
             self.data[key]['location'] = self._getLocation(self.data[key])
 
     def _getLocation(self, artist):
-        location = ', '.join([artist['city'],
-                              artist['state'],
-                              artist['country']])
-        return location.replace(', ,', ',')
+        locations = []
+        for field in ['city', 'state', 'country']:
+            if artist[field]:
+                locations.append(artist[field])
+        return ', '.join(locations)
 
     def getArtist(self, key):
         if key not in self.data:
             raise ArtistNotFound('Artist %s not found' % key)
         return self.data[key]
         
-    UNKNOWN_ARTIST = {'name': 'Unknown Artist',
+    UNKNOWN_ARTIST = {'name': 'Postcard Humanity',
                       'location': '',
                       'website': ''}
 
