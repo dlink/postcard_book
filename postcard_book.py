@@ -28,12 +28,18 @@ class Book(object):
         '''
         self.postcards = self.getPostcards()
         postcard_keys = sorted(self.postcards.keys())
-        #for i in range(0, 5):
-        for postcard_key in postcard_keys:
+        for i, postcard_key in enumerate(postcard_keys):
+            print i, postcard_key
             self.addPage(self.postcards[postcard_key])
+
         self.pdf.output(BOOK_FILENAME, 'F')
 
     def addPage(self, postcard):
+        #print 'p:', postcard
+        if postcard.files.front is None:
+            print 'skipping %s: no front' % postcard.name
+            return
+
         if Image(IMAGE_DIR + '/' + postcard.files.front).orientation \
                 == 'landscape':
             return self.addPage_landscape(postcard)
