@@ -9,11 +9,11 @@ from artists import Artists, ArtistNotFound
 from images import Image
 
 BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625] # height, width
-FONT = 'Arial'
-BOOK_FILENAME = 'book.pdf'
+BOOK_FILENAME = 'book1.pdf'
 
 IMAGE_DIR = '/data/afa_images'
 SUPPORTED_EXTENSIONS = ['jpg', 'png']
+NON_POSTCARD_FILES = ['cover_arg.jpg', '.DS_Store']
 
 class FilenameError(Exception): pass
 
@@ -21,7 +21,9 @@ class Book(object):
 
     def __init__(self):
         self.pdf = FPDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
-        self.pdf.set_font(FONT, '', 12)
+        self.pdf.add_font('DejaVu', '', '/Applications/OpenOffice.org.app/Contents/basis-link/share/fonts/truetype/DejaVuSansCondensed.ttf', uni=True)
+        self.pdf.set_font('DejaVu', '', 12)
+
         self.pdf.set_text_color(169,169,169) # DarkGrey
         self.artists = Artists()
 
@@ -29,17 +31,90 @@ class Book(object):
         '''Build Book
            Creates PDF file, BOOK_FILENAME
         '''
+        self.addFrontCover()
+        self.addIntro()
+
         self.postcards = self.getPostcards()
         postcard_keys = sorted(self.postcards.keys())
         for i, postcard_key in enumerate(postcard_keys):
             print i, postcard_key
             self.addPage(self.postcards[postcard_key])
-            #if i > 5:
-            #    break
+            if i > 5:
+                break
+
+        self.addBackCover()
+
         self.pdf.output(BOOK_FILENAME, 'F')
+
+    def addFrontCover(self):
+        self.pdf.add_page()
+        self.pdf.image(IMAGE_DIR + '/' + 'cover_art.jpg', 2, 1, 6)
+
+        self.pdf.set_font('DejaVu', '', 32)
+        self.pdf.set_xy(2.5, 5.25)
+        self.pdf.cell(0, 0, 'Postcards to humanity')
+
+        self.pdf.set_font('DejaVu', '', 18)
+        self.pdf.set_xy(2, 6.25)
+        self.pdf.cell(0, 0,
+                      'In response to the atrocities in Aleppo, we have made')
+        self.pdf.set_xy(2, 6.65)
+        self.pdf.cell(0, 0, 
+                      '    a call to artists from around the world to respond.'
+                      )
+    def addIntro(self):
+        self.pdf.set_font('DejaVu', '', 12)
+        self.pdf.add_page()
+        self.pdf.set_xy(1, 1)
+        self.pdf.multi_cell(0, .25, '''
+The battle for Aleppo is marked by widespread violence against
+civilians, repeated targeting of hospitals and schools, and
+indiscriminate aerial strikes and shelling against civilian
+areas. Hundreds of thousands of residents have been displaced by the
+fighting and efforts to provide aid to civilians or facilitate
+evacuation is routinely disrupted. After four years of fighting, the
+battle represents one of the longest sieges in modern warfare. The
+Syrian Observatory for Human Rights (SOHR) registered that in 1612
+days of fighting 21,452 civilians died. Among them were 5,261 children
+under the age of 18. We want to help and so can you! The Art For
+Aleppo project gives visual artists an outlet to express themselves
+around the Syrian crisis and help raise awareness and funds to aid in
+the effort to provide Syrian children emergency care, food and
+water. The Art For Aleppo project also gives non artists a chance to
+help in three ways, through the purchase of art, through the purchase
+of the catalog book of participating artists or through a direct
+monetary donation in any amount. You may donate by going to
+http://artforaleppo.org/donate.py
+
+100% of your purchases or donations are tax deductible. All purchases
+and donations are made directly to save the children Syria. We at "Art
+For Aleppo" project won't take a single penny. Artwork will be
+displayed at Catalyst Gallery 137 Main Street, Beacon NY on April 22nd
+and will continue to be available for purchase online. The catalog
+book of participating artists images will be available online with
+blurb.com titled "Art For Aleppo" beginning on April 20th. Blurb is a
+self publishing on demand book forum online so there is never a waste
+of paper or upfront costs for Art For Aleppo. This allows us as
+artists in this project to create without spending donations on
+production or administration. All monies go directly to Save the
+Children Syria.
+
+April 19, 2017
+
+
+The Art for Aleppo Team:
+
+Russ Ritell - www.russritell.com
+Carla Goldberg -  www.carlagoldberg.com
+David Link - www.davidlinkart.com
+''')
+            
+    def addBackCover(self):
+        pass
 
     def addPage(self, postcard):
         #print 'p:', postcard
+        self.pdf.set_font('DejaVu', '', 12)
         if postcard.files.front is None:
             print 'skipping %s: no front' % postcard.name
             return
@@ -111,6 +186,9 @@ class Book(object):
 
         postcards = odict()
         for n, filename in enumerate(os.listdir(IMAGE_DIR)):
+                           
+            if filename in NON_POSTCARD_FILES:
+                continue
 
             # separtate filename and extention:
             parts = filename.split('.')
