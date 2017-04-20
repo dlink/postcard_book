@@ -9,11 +9,14 @@ from artists import Artists, ArtistNotFound
 from images import Image
 
 BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625] # height, width
-BOOK_FILENAME = 'book1.pdf'
+BOOK_FILENAME = 'book2.pdf'
 
 IMAGE_DIR = '/data/afa_images'
 SUPPORTED_EXTENSIONS = ['jpg', 'png']
-NON_POSTCARD_FILES = ['cover_arg.jpg', '.DS_Store']
+NON_POSTCARD_FILES = ['cover_art.jpg', '.DS_Store']
+
+# HACK - need to set this manually
+LAST_PAGE = 10
 
 class FilenameError(Exception): pass
 
@@ -23,13 +26,14 @@ class PDF(FPDF):
         self.set_xy(0.5, 3.0)
         self.set_font('DejaVu', '', 8)
         self.set_text_color(169,169,169) # DarkGrey
-        if self.page_no() > 1:
+        if self.page_no() > 1 and self.page_no()-1 < LAST_PAGE:
             self.cell(0, 10, str(self.page_no()-1), 0, 0, 'C')
 
 class Book(object):
 
     def __init__(self):
         self.pdf = PDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
+        self.pdf.alias_nb_pages()
         self.pdf.add_font('DejaVu', '', '/Applications/OpenOffice.org.app/Contents/basis-link/share/fonts/truetype/DejaVuSansCondensed.ttf', uni=True)
         self.pdf.set_font('DejaVu', '', 12)
 
@@ -72,7 +76,25 @@ class Book(object):
                       '    a call to artists from around the world to respond.'
                       )
     def addBackCover(self):
-        pass
+        'donna_marie' ' -b'
+        'kerry mcaleer'
+        'sheilah-b'
+        'mj-bono'
+        self.pdf.add_page()
+        self.pdf.image(IMAGE_DIR + '/' + 'Donna_Marie_Fischer.jpg',
+                       1.25, 1.25, 3)
+        self.pdf.image(IMAGE_DIR + '/' + 'MJ_Bono.jpg',
+                       5, 1.25, 3)
+        #self.pdf.image(IMAGE_DIR + '/' + 'Sheilah_Rechtschaffer4-b.jpg',
+        #               1.25, 4.25, 3)
+        self.pdf.image(IMAGE_DIR + '/' + 'Sheilah_Rechtschaffer2-b.jpg',
+                       1.25, 4.25, 3)
+        self.pdf.image(IMAGE_DIR + '/' + 'Naomi_Genen2.jpg',
+                       5, 4.40, 3)
+
+        self.pdf.set_xy(4, 7.0)
+        self.pdf.cell(0, 0, 'Art for Aleppo')
+
 
     def addPage(self, postcard):
         #print 'p:', postcard
@@ -232,7 +254,7 @@ Children Syria.
 April 19, 2017
 
 
-The Art for Aleppo Team:
+The Art for Aleppo Team - Cold Spring, NY, USA
 
 Russ Ritell - www.russritell.com
 Carla Goldberg -  www.carlagoldberg.com
