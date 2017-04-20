@@ -9,14 +9,13 @@ from artists import Artists, ArtistNotFound
 from images import Image
 
 BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625] # height, width
-BOOK_FILENAME = 'book2.pdf'
-
+BOOK_FILENAME = 'book.pdf'
 IMAGE_DIR = '/data/afa_images'
 SUPPORTED_EXTENSIONS = ['jpg', 'png']
 NON_POSTCARD_FILES = ['cover_art.jpg', '.DS_Store']
 
 # HACK - need to set this manually
-LAST_PAGE = 10
+LAST_PAGE = 93
 
 class FilenameError(Exception): pass
 
@@ -50,10 +49,10 @@ class Book(object):
         self.postcards = self.getPostcards()
         postcard_keys = sorted(self.postcards.keys())
         for i, postcard_key in enumerate(postcard_keys):
-            print i, postcard_key
+            #print i, postcard_key
             self.addPage(self.postcards[postcard_key])
-            if i > 5:
-                break
+            #if i > 5:
+            #    break
 
         self.addBackCover()
 
