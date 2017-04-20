@@ -17,10 +17,19 @@ NON_POSTCARD_FILES = ['cover_arg.jpg', '.DS_Store']
 
 class FilenameError(Exception): pass
 
+class PDF(FPDF):
+
+    def footer(self):
+        self.set_xy(0.5, 3.0)
+        self.set_font('DejaVu', '', 8)
+        self.set_text_color(169,169,169) # DarkGrey
+        if self.page_no() > 1:
+            self.cell(0, 10, str(self.page_no()-1), 0, 0, 'C')
+
 class Book(object):
 
     def __init__(self):
-        self.pdf = FPDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
+        self.pdf = PDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
         self.pdf.add_font('DejaVu', '', '/Applications/OpenOffice.org.app/Contents/basis-link/share/fonts/truetype/DejaVuSansCondensed.ttf', uni=True)
         self.pdf.set_font('DejaVu', '', 12)
 
@@ -62,53 +71,6 @@ class Book(object):
         self.pdf.cell(0, 0, 
                       '    a call to artists from around the world to respond.'
                       )
-    def addIntro(self):
-        self.pdf.set_font('DejaVu', '', 12)
-        self.pdf.add_page()
-        self.pdf.set_xy(1, 1)
-        self.pdf.multi_cell(0, .25, '''
-The battle for Aleppo is marked by widespread violence against
-civilians, repeated targeting of hospitals and schools, and
-indiscriminate aerial strikes and shelling against civilian
-areas. Hundreds of thousands of residents have been displaced by the
-fighting and efforts to provide aid to civilians or facilitate
-evacuation is routinely disrupted. After four years of fighting, the
-battle represents one of the longest sieges in modern warfare. The
-Syrian Observatory for Human Rights (SOHR) registered that in 1612
-days of fighting 21,452 civilians died. Among them were 5,261 children
-under the age of 18. We want to help and so can you! The Art For
-Aleppo project gives visual artists an outlet to express themselves
-around the Syrian crisis and help raise awareness and funds to aid in
-the effort to provide Syrian children emergency care, food and
-water. The Art For Aleppo project also gives non artists a chance to
-help in three ways, through the purchase of art, through the purchase
-of the catalog book of participating artists or through a direct
-monetary donation in any amount. You may donate by going to
-http://artforaleppo.org/donate.py
-
-100% of your purchases or donations are tax deductible. All purchases
-and donations are made directly to save the children Syria. We at "Art
-For Aleppo" project won't take a single penny. Artwork will be
-displayed at Catalyst Gallery 137 Main Street, Beacon NY on April 22nd
-and will continue to be available for purchase online. The catalog
-book of participating artists images will be available online with
-blurb.com titled "Art For Aleppo" beginning on April 20th. Blurb is a
-self publishing on demand book forum online so there is never a waste
-of paper or upfront costs for Art For Aleppo. This allows us as
-artists in this project to create without spending donations on
-production or administration. All monies go directly to Save the
-Children Syria.
-
-April 19, 2017
-
-
-The Art for Aleppo Team:
-
-Russ Ritell - www.russritell.com
-Carla Goldberg -  www.carlagoldberg.com
-David Link - www.davidlinkart.com
-''')
-            
     def addBackCover(self):
         pass
 
@@ -230,6 +192,53 @@ David Link - www.davidlinkart.com
 
         return postcards
 
+    def addIntro(self):
+        self.pdf.set_font('DejaVu', '', 12)
+        self.pdf.add_page()
+        self.pdf.set_xy(1, 1)
+        self.pdf.multi_cell(0, .25, '''
+The battle for Aleppo is marked by widespread violence against
+civilians, repeated targeting of hospitals and schools, and
+indiscriminate aerial strikes and shelling against civilian
+areas. Hundreds of thousands of residents have been displaced by the
+fighting and efforts to provide aid to civilians or facilitate
+evacuation is routinely disrupted. After four years of fighting, the
+battle represents one of the longest sieges in modern warfare. The
+Syrian Observatory for Human Rights (SOHR) registered that in 1612
+days of fighting 21,452 civilians died. Among them were 5,261 children
+under the age of 18. We want to help and so can you! The Art For
+Aleppo project gives visual artists an outlet to express themselves
+around the Syrian crisis and help raise awareness and funds to aid in
+the effort to provide Syrian children emergency care, food and
+water. The Art For Aleppo project also gives non artists a chance to
+help in three ways, through the purchase of art, through the purchase
+of the catalog book of participating artists or through a direct
+monetary donation in any amount. You may donate by going to
+http://artforaleppo.org/donate.py
+
+100% of your purchases or donations are tax deductible. All purchases
+and donations are made directly to save the children Syria. We at "Art
+For Aleppo" project won't take a single penny. Artwork will be
+displayed at Catalyst Gallery 137 Main Street, Beacon NY on April 22nd
+and will continue to be available for purchase online. The catalog
+book of participating artists images will be available online with
+blurb.com titled "Art For Aleppo" beginning on April 20th. Blurb is a
+self publishing on demand book forum online so there is never a waste
+of paper or upfront costs for Art For Aleppo. This allows us as
+artists in this project to create without spending donations on
+production or administration. All monies go directly to Save the
+Children Syria.
+
+April 19, 2017
+
+
+The Art for Aleppo Team:
+
+Russ Ritell - www.russritell.com
+Carla Goldberg -  www.carlagoldberg.com
+David Link - www.davidlinkart.com
+''')
+            
 if __name__ == '__main__':
     Book().build()
     #for k, v in Book().getPostcards().items():
