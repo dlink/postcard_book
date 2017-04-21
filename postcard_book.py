@@ -9,13 +9,13 @@ from artists import Artists, ArtistNotFound
 from images import Image
 
 BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625] # height, width
-BOOK_FILENAME = 'book.pdf'
-IMAGE_DIR = '/data/afa_images'
-SUPPORTED_EXTENSIONS = ['jpg', 'png']
+BOOK_FILENAME = 'book2.pdf'
+IMAGE_DIR = '/data/afa_images2'
+SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 NON_POSTCARD_FILES = ['cover_art.jpg', '.DS_Store']
 
 # HACK - need to set this manually
-LAST_PAGE = 93
+LAST_PAGE = 171
 
 class FilenameError(Exception): pass
 
