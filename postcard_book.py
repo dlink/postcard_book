@@ -9,7 +9,7 @@ from artists import Artists, ArtistNotFound
 from images import Image
 
 BLURB_BOOK_8X10_LANDSCAPE_DIM = [8.250, 9.625] # height, width
-BOOK_FILENAME = 'book2.pdf'
+BOOK_FILENAME = 'book3.pdf'
 IMAGE_DIR = '/data/afa_images2'
 SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 NON_POSTCARD_FILES = ['cover_art.jpg', '.DS_Store']
@@ -33,7 +33,13 @@ class Book(object):
     def __init__(self):
         self.pdf = PDF('L', 'in', BLURB_BOOK_8X10_LANDSCAPE_DIM)
         self.pdf.alias_nb_pages()
-        self.pdf.add_font('DejaVu', '', '/Applications/OpenOffice.org.app/Contents/basis-link/share/fonts/truetype/DejaVuSansCondensed.ttf', uni=True)
+
+        # eagel - home mac
+        #self.pdf.add_font('DejaVu', '', '/Applications/OpenOffice.org.app/Contents/basis-link/share/fonts/truetype/DejaVuSansCondensed.ttf', uni=True)
+
+        # rat - work mac
+        self.pdf.add_font('DejaVu', '', '/Applications/OpenOffice.app/Contents/share/fonts/truetype/DejaVuSansCondensed.ttf', uni=True)
+
         self.pdf.set_font('DejaVu', '', 12)
 
         self.pdf.set_text_color(169,169,169) # DarkGrey
@@ -51,7 +57,7 @@ class Book(object):
         for i, postcard_key in enumerate(postcard_keys):
             #print i, postcard_key
             self.addPage(self.postcards[postcard_key])
-            #if i > 5:
+            #if i > 80:
             #    break
 
         self.addBackCover()
