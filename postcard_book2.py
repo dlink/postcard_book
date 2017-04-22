@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+from copy import copy
 
 from fpdf import FPDF
 
@@ -15,7 +16,8 @@ SUPPORTED_EXTENSIONS = ['jpg', 'jpeg', 'png']
 NON_POSTCARD_FILES = ['cover_art.jpg', '.DS_Store']
 
 # HACK - need to set this manually
-LAST_PAGE = 171
+#LAST_PAGE = 171
+LAST_PAGE = 87
 
 class FilenameError(Exception): pass
 
@@ -63,9 +65,11 @@ class Book(object):
         #    #    break
 
         # layout 2
+    
         i = 0
         while postcard_keys:
             postcard_key1 = postcard_keys.pop(0)
+
             i += 1
             if postcard_keys:
                 postcard_key2 = postcard_keys.pop(0)
@@ -73,7 +77,7 @@ class Book(object):
             else:
                 postcard_key2 = None
             self.addPage2(self.postcards[postcard_key1], 
-                          self.postcards[postcard_key2])
+                          self.postcards.get(postcard_key2))
             #if i > 40:
             #    break
 
@@ -120,11 +124,11 @@ class Book(object):
 
 
     def addPage2(self, postcard1, postcard2):
+        '''Four up layout'''
+
         self.pdf.set_font('DejaVu', '', 12)
         self.pdf.add_page()
-        if postcard1.files.front is None:
-            print 'skipping %s: now front' % postcard.name
-
+        
         #  1
         xadj, yadj, width, textxadj, textyadj = self._getCoord(postcard1)
             
@@ -140,27 +144,30 @@ class Book(object):
 
 
         #  2
-        xadj, yadj, width, textxadj, textyadj = self._getCoord(postcard2)
-        # front
-        self.pdf.image(IMAGE_DIR + '/' + postcard2.files.front,
-                       5 + xadj, .75 + yadj, width)
-        # back
-        if postcard2.files.back:
-            self.pdf.image(IMAGE_DIR + '/' +postcard2.files.back,
-                           5 + xadj, 4.0 + yadj + yadj, width)
-        # text
-        self.place_text(5.5 + textxadj, 6.5 + textyadj, postcard2)
+        if postcard2:
+            xadj, yadj, width, textxadj, textyadj = self._getCoord(postcard2)
+            # front
+            self.pdf.image(IMAGE_DIR + '/' + postcard2.files.front,
+                           5 + xadj, .75 + yadj, width)
+            # back
+            if postcard2.files.back:
+                self.pdf.image(IMAGE_DIR + '/' +postcard2.files.back,
+                               5 + xadj, 4.0 + yadj + yadj, width)
+            # text
+            self.place_text(5.5 + textxadj, 6.5 + textyadj, postcard2)
 
 
     def _getCoord(self, postcard):
         '''Return xadj, yadj, width, textxadj, textyadj'''
-        if Image(IMAGE_DIR + '/' + postcard.files.front).orientation \
-                == 'landscape':
+        orientation = Image(IMAGE_DIR + '/' + postcard.files.front).orientation
+        if not orientation or orientation == 'landscape':
             return 0, 0, 3, 0, 0
         else:
             return 1, -0.25, 2, 0.5, 0.25
 
     def addPage(self, postcard):
+        '''Two up layout'''
+
         #print 'p:', postcard
         self.pdf.set_font('DejaVu', '', 12)
         if postcard.files.front is None:
@@ -275,6 +282,12 @@ class Book(object):
                 print 'Warn: %s: No front image' % postcard
             elif not data.files.back:
                 print 'Warn: %s: No back image' % postcard
+
+        # remove those with not fonts:
+        for k in postcards.keys():
+            if postcards[k].files.front is None:
+                print 'skipping %s: no front' % postcards[k].name
+                del postcards[k]
 
         return postcards
 
