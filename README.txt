@@ -10,3 +10,8 @@ Syria.
 This book will also be used to raise donations.
 
 http://artforaleppo.org
+
+
+postcards.py generates a book with two images per page.  Front and back for each artist
+
+postcard2.py generates a book with four images per page. Front and back of two artists.
