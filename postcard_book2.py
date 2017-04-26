@@ -17,7 +17,7 @@ NON_POSTCARD_FILES = ['cover_art.jpg', '.DS_Store']
 
 # HACK - need to set this manually
 #LAST_PAGE = 171
-LAST_PAGE = 87
+LAST_PAGE = 80
 
 class FilenameError(Exception): pass
 
@@ -55,8 +55,12 @@ class Book(object):
         self.addIntro()
 
         self.postcards = self.getPostcards()
-        postcard_keys = sorted(self.postcards.keys())
+        #postcard_keys = sorted(self.postcards.keys())
 
+        # sort by lastname
+        postcard_keys = sorted(self.postcards.keys(),
+                               key=lambda k: \
+                                   self.postcards[k].name.split(' ')[-1])
         # layout 1
         #for i, postcard_key in enumerate(postcard_keys):
         #    #print i, postcard_key
@@ -166,14 +170,23 @@ class Book(object):
 
         # spec handling for some cards:
         if postcard.name in ('Colleen Gahrmann', 'Elizabeth White',
-                             'Galeyn Williams', 'Janet Blackwell',
+                             'Galelyn Williams', 'Janet Blackwell',
                              'Jodi Gerbi', 'Russell Ritell'):
-            # move top card up a notch
+            # portrait - move top card up a notch
             return \
                 2, 0.25, \
                 2, 3.5, \
                 2.0, \
                 2, 6.8
+
+        # spec handling 2 for some cards
+        if postcard.name in ('Lana Yur'):
+            # landscape - bottom top card up a notch
+            return \
+                1, 0.75, \
+                1, 3.75, \
+                3.5, \
+                1.5, 6.8
 
         orientation = Image(IMAGE_DIR + '/' + postcard.files.front).orientation
         if not orientation or orientation == 'landscape':
