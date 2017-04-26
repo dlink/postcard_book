@@ -17,6 +17,8 @@ class Artists(object):
                 header = [x.lower() for x in row]
                 continue
             key = row[2]
+            if key in self.data:
+                continue
             self.data[key] = {}
             for i, h in enumerate(header):
                 self.data[key][h] = row[i]
