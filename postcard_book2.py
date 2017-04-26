@@ -69,7 +69,7 @@ class Book(object):
         i = 0
         while postcard_keys:
             postcard_key1 = postcard_keys.pop(0)
-
+            
             i += 1
             if postcard_keys:
                 postcard_key2 = postcard_keys.pop(0)
@@ -130,40 +130,64 @@ class Book(object):
         self.pdf.add_page()
         
         #  1
-        xadj, yadj, width, textxadj, textyadj = self._getCoord(postcard1)
+        fx, fy, bx, by, width, textx, texty = self._getCoord(postcard1)
+        #xadj, yadj, width, textxadj, textyadj = self._getCoord(postcard1)
             
         # front
-        self.pdf.image(IMAGE_DIR + '/' + postcard1.files.front,
-                       1 + xadj, .75 + yadj, width)
+        self.pdf.image(IMAGE_DIR + '/' + postcard1.files.front, fx, fy, width)
         # back
         if postcard1.files.back:
-            self.pdf.image(IMAGE_DIR + '/' + postcard1.files.back,
-                           1 + xadj, 4.0 + yadj + yadj, width)
+            self.pdf.image(IMAGE_DIR + '/' + postcard1.files.back, bx,by,width)
+
         # text
-        self.place_text(1.5 + textxadj, 6.4 + textyadj, postcard1)
+        self.place_text(textx, texty, postcard1)
 
 
         #  2
         if postcard2:
-            xadj, yadj, width, textxadj, textyadj = self._getCoord(postcard2)
+            fx, fy, bx, by, width, textx, texty = self._getCoord(postcard2)
+            #xadj, yadj, width, textxadj, textyadj = self._getCoord(postcard2)
             # front
             self.pdf.image(IMAGE_DIR + '/' + postcard2.files.front,
-                           5 + xadj, .75 + yadj, width)
+                           fx + 4, fy, width)
             # back
             if postcard2.files.back:
                 self.pdf.image(IMAGE_DIR + '/' +postcard2.files.back,
-                               5 + xadj, 4.0 + yadj + yadj, width)
+                               bx + 4, by, width)
             # text
-            self.place_text(5.5 + textxadj, 6.5 + textyadj, postcard2)
+            self.place_text(textx + 4, texty, postcard2)
 
 
     def _getCoord(self, postcard):
-        '''Return xadj, yadj, width, textxadj, textyadj'''
+        '''Return front_x, front_y,
+                  back_x, back_y
+                  width,
+                  textx, and texty'''
+
+        # spec handling for some cards:
+        if postcard.name in ('Colleen Gahrmann', 'Elizabeth White',
+                             'Galeyn Williams', 'Janet Blackwell',
+                             'Jodi Gerbi', 'Russell Ritell'):
+            # move top card up a notch
+            return \
+                2, 0.25, \
+                2, 3.5, \
+                2.0, \
+                2, 6.8
+
         orientation = Image(IMAGE_DIR + '/' + postcard.files.front).orientation
         if not orientation or orientation == 'landscape':
-            return 0, 0, 3, 0, 0
+            return \
+                1, 0.75, \
+                1, 4.0, \
+                3.5, \
+                1.5, 6.8
         else:
-            return 1, -0.25, 2, 0.5, 0.25
+            return \
+                2, 0.5, \
+                2, 3.5, \
+                2.0, \
+                2, 6.8
 
     def addPage(self, postcard):
         '''Two up layout'''
@@ -241,7 +265,7 @@ class Book(object):
 
         postcards = odict()
         for n, filename in enumerate(os.listdir(IMAGE_DIR)):
-                           
+            
             if filename in NON_POSTCARD_FILES:
                 continue
 
@@ -288,6 +312,19 @@ class Book(object):
             if postcards[k].files.front is None:
                 print 'skipping %s: no front' % postcards[k].name
                 del postcards[k]
+
+        # hack to limit book to some test pages
+        #for k in postcards.keys():
+            #if postcards[k].name not in (
+                #'Arian Lis', 'Alexandro Lis',
+                #'Carina Perez', 'Carla Goldberg', 'Carol Flaitz',
+                #'Carole Kunstadt', 'Charles Geiger',
+                #'Ciprian Celegean', 'Claudia Gorman',
+
+                #'Colleen Gahrmann', 'Coleen Kavana'
+
+                #):
+                #del postcards[k]
 
         return postcards
 
