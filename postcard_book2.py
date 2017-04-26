@@ -245,10 +245,16 @@ class Book(object):
             print 'Failed to lookup artist: %s' % postcard['name']
             artist = Artists.UNKNOWN_ARTIST
             artist['name'] = postcard['name']
+                
+        #text = [artist['name'],
+        #        artist['location'],
+        #        artist['website']]
 
-        text = [artist['name'],
-                artist['location'],
-                artist['website']]
+        text = []
+        for f in ['name', 'location', 'website']:
+            if artist[f]:
+                text.append(artist[f])
+
         for t in text:
             self.pdf.set_xy(x, y)
             self.pdf.cell(0, 0, t)
@@ -365,18 +371,18 @@ of the catalog book of participating artists or through a direct
 monetary donation in any amount. You may donate by going to
 http://artforaleppo.org/donate.py
 
-100% of your purchases or donations are tax deductible. All purchases
-and donations are made directly to save the children Syria. We at "Art
-For Aleppo" project won't take a single penny. Artwork will be
-displayed at Catalyst Gallery 137 Main Street, Beacon NY on April 22nd
-and will continue to be available for purchase online. The catalog
-book of participating artists images will be available online with
-blurb.com titled "Art For Aleppo" beginning on April 20th. Blurb is a
-self publishing on demand book forum online so there is never a waste
-of paper or upfront costs for Art For Aleppo. This allows us as
-artists in this project to create without spending donations on
-production or administration. All monies go directly to Save the
-Children Syria.
+Your purchases or donations are tax deductible. All purchases and
+donations are made directly to Save the Children Syria. We at "Art For
+Aleppo" do not receive any money. Artwork will be displayed at the
+Catalyst Gallery 137 Main Street, Beacon NY opening April 22nd, and at
+the Garnerville Arts in Haverstraw, NY opening May 20th, 2017, and
+will continue to be available for purchase online. The catalog book of
+participating artists images will be available online with blurb.com
+titled "Art For Aleppo" in April 2017. Blurb is an on demand book
+publisher. There is no waste of paper or upfront costs for Art For
+Aleppo. This allows us as artists in this project to create without
+spending on production or administration. All monies go
+directly to Save the Children Syria.
 
 April 19, 2017
 
